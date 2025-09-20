@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Raumplan - Leaflet</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="top-nav">
+        <div class="nav-content">
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <h1 class="nav-title">🏢 Raumplan</h1>
+                <button class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+
+            <!-- Desktop Navigation (hidden on mobile) -->
+            <div class="desktop-nav">
+                <div class="nav-left">
+                    <h1 class="nav-title">🏢 Raumplan</h1>
+                    <div class="current-info">
+                        <span id="current-floor">Hauptgebäude - Erdgeschoss</span>
+                    </div>
+                </div>
+
+                <div class="nav-center">
+                    <div class="building-selector">
+                        <div class="building-group">
+                            <span class="building-label">Hauptgebäude</span>
+                            <div class="floor-buttons">
+                                <button class="floor-btn active" data-floor="1">UG</button>
+                                <button class="floor-btn" data-floor="2">EG</button>
+                                <button class="floor-btn" data-floor="3">1.</button>
+                                <button class="floor-btn" data-floor="4">2.</button>
+                                <button class="floor-btn" data-floor="5">3.</button>
+                            </div>
+                        </div>
+
+                        <div class="building-group">
+                            <span class="building-label">Werkstatt</span>
+                            <div class="floor-buttons">
+                                <button class="floor-btn" data-floor="6">EG</button>
+                                <button class="floor-btn" data-floor="7">1.</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <div class="status-info">
+                        <span id="floor-info">Wählen Sie ein Stockwerk oder einen Raum</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (hidden by default) -->
+        <div class="mobile-menu" id="mobile-menu">
+            <div class="mobile-current-info">
+                <span id="mobile-current-floor">Hauptgebäude - Erdgeschoss</span>
+            </div>
+
+            <div class="mobile-building-selector">
+                <div class="mobile-building-group">
+                    <span class="mobile-building-label">Hauptgebäude</span>
+                    <div class="mobile-floor-buttons">
+                        <button class="mobile-floor-btn active" data-floor="1">UG</button>
+                        <button class="mobile-floor-btn" data-floor="2">EG</button>
+                        <button class="mobile-floor-btn" data-floor="3">1.</button>
+                        <button class="mobile-floor-btn" data-floor="4">2.</button>
+                        <button class="mobile-floor-btn" data-floor="5">3.</button>
+                    </div>
+                </div>
+
+                <div class="mobile-building-group">
+                    <span class="mobile-building-label">Werkstatt</span>
+                    <div class="mobile-floor-buttons">
+                        <button class="mobile-floor-btn" data-floor="6">EG</button>
+                        <button class="mobile-floor-btn" data-floor="7">1.</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-action-buttons">
+                <button class="mobile-action-btn" onclick="openVocationalOverlay(); closeMobileMenu();">
+                    🎓 Tag der beruflichen Bildung
+                </button>
+                <button class="mobile-action-btn" onclick="openExhibitorOverlay(); closeMobileMenu();">
+                    🏢 Berufsfindungsmesse
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Bottom Tab Bar (Desktop only) -->
+    <div class="bottom-tab-bar desktop-only">
+        <button class="tab-btn" onclick="openVocationalOverlay()">
+            <span class="tab-icon" style="background: #28a745;"></span>
+            <span class="tab-text">Tag der beruflichen Bildung</span>
+        </button>
+        <button class="tab-btn" onclick="openExhibitorOverlay()">
+            <span class="tab-icon" style="background: #FFA500;"></span>
+            <span class="tab-text">Berufsfindungsmesse</span>
+        </button>
+    </div>
+
+    <!-- Logo -->
+    <div class="logo-container">
+        <img src="logo.svg" alt="Logo" class="logo">
+    </div>
+
+    <!-- Help Button -->
+    <div class="help-container">
+        <button class="help-btn" onclick="openWelcomeOverlay()" aria-label="Hilfe anzeigen" title="Hilfe & Anleitung">
+            <span class="help-icon">?</span>
+        </button>
+    </div>
+
+
+    <!-- Exhibitor Overlay -->
+    <div class="overlay" id="exhibitor-overlay" onclick="closeExhibitorOverlay()">
+        <div class="overlay-content" onclick="event.stopPropagation()">
+            <div class="overlay-header">
+                <h2>🏢 Berufsfindungsmesse</h2>
+                <button class="close-btn" onclick="closeExhibitorOverlay()">×</button>
+            </div>
+            <div class="overlay-body">
+                <div class="search-box">
+                    <input type="text" id="exhibitor-search" placeholder="Aussteller suchen..." onkeyup="filterExhibitors()">
+                </div>
+                <div class="exhibitor-list" id="exhibitor-list">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocational Education Overlay -->
+    <div class="overlay" id="vocational-overlay" onclick="closeVocationalOverlay()">
+        <div class="overlay-content" onclick="event.stopPropagation()">
+            <div class="overlay-header">
+                <h2>🎓 Tag der beruflichen Bildung</h2>
+                <button class="close-btn" onclick="closeVocationalOverlay()">×</button>
+            </div>
+            <div class="overlay-body">
+                <div class="search-box">
+                    <input type="text" id="vocational-search" placeholder="Bildungsangebote suchen..." onkeyup="filterVocational()">
+                </div>
+                <div class="vocational-list" id="vocational-list">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Overlay -->
+    <div class="overlay" id="welcome-overlay" onclick="closeWelcomeOverlay()">
+        <div class="overlay-content welcome-content" onclick="event.stopPropagation()">
+            <div class="overlay-header">
+                <h2>🏢 Willkommen zum Raumplan!</h2>
+                <button class="close-btn" onclick="closeWelcomeOverlay()">×</button>
+            </div>
+            <div class="overlay-body">
+                <div class="welcome-section">
+                    <h3>📍 So funktioniert die Navigation:</h3>
+                    <ul class="welcome-list">
+                        <li><strong>Stockwerke wählen:</strong> Klicken Sie auf die Buttons (UG, EG, 1., 2., 3.) um zwischen den Stockwerken zu wechseln</li>
+                        <li><strong>Räume finden:</strong> Klicken Sie auf die farbigen Punkte auf der Karte für Rauminformationen</li>
+                        <li><strong>Events:</strong> Nutzen Sie die Buttons unten für spezielle Veranstaltungen</li>
+                    </ul>
+                </div>
+
+                <div class="welcome-section">
+                    <h3>🏫 Raumbezeichnungen verstehen:</h3>
+                    <div class="room-system">
+                        <div class="room-example">
+                            <span class="room-code">A.2.15</span>
+                            <div class="room-explanation">
+                                <span class="building-letter">A</span> = Gebäude (A-E: Hauptgebäude)
+                                <span class="floor-number">2</span> = Stockwerk (-1=UG, 0=EG, 1=1.Stock, etc.)
+                                <span class="room-number">15</span> = Raumnummer
+                            </div>
+                        </div>
+                        <div class="building-info">
+                            <p><strong>Hauptgebäude:</strong> A, B, C, D, E</p>
+                            <p><strong>Werkstattgebäude:</strong> F, G</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="welcome-footer">
+                    <p class="welcome-greeting">🎉 <strong>Viel Spaß an unserer Schule!</strong></p>
+                    <button class="welcome-start-btn" onclick="closeWelcomeOverlay()">Los geht's!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
