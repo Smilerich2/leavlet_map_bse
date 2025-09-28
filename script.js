@@ -27,11 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentImageOverlay = null;
     let roomMarkers = [];
     let eventMarkers = [];
-    let highlightedMarker = null;
 
-    // Marker-Cache für bessere Performance
-    let markerCache = new Map();
     let loadingMarkers = false;
+    let highlightedMarker = null;
 
     // Device detection
     const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
@@ -45,22 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
             zoom: 0,
             bounds: [[0, 0], [600, 800]]
         },
-        ui: {
-            highlightDuration: 5000,
-            zoomAnimationDuration: 0.8,
-            menuDelay: 100,
-            pulseInterval: 300,
-            pulseCount: 6
-        },
         marker: {
             radius: isMobile ? 9 : 8,
             weight: 2,
             opacity: 1,
-            fillOpacity: 0.8,
-            highlightRadius: isMobile ? 18 : 15,
-            highlightWeight: 4,
-            highlightFillOpacity: 0.9,
-            touchRadius: 44 // Minimum touch target size (invisible)
+            fillOpacity: 0.8
         }
     };
 
@@ -74,75 +61,75 @@ document.addEventListener('DOMContentLoaded', function() {
     // Diese Koordinaten müssen an Ihre tatsächlichen Raumpläne angepasst werden
     const roomCoordinates = {
         // Hauptgebäude - Untergeschoss
-        'C.-1.44': { x: 341, y: 237 },
-        'A.-1.14': { x: 737, y: 292 },
-        'A.-1.15': { x: 740, y: 249 },
-        'A.-1.16': { x: 744, y: 205 },
-        'A.-1.17': { x: 748, y: 153 },
-        'A.-1.18': { x: 687, y: 143 },
-        'A.-1.20': { x: 681, y: 233 },
-        'D.-1.52': { x: 225, y: 231 },
-        'E.-1.63': { x: 135, y: 178 },
-        'E.-1.64': { x: 73, y: 185 },
-        'E.-1.65': { x: 74, y: 248 },
-        'E.-1.66': { x: 68, y: 324 },
-        'E.-1.69': { x: 135, y: 298 },
+        'C.-1.44': { x: 365, y: 309 },
+        'A.-1.14': { x: 665, y: 347 },
+        'A.-1.15': { x: 668, y: 312 },
+        'A.-1.16': { x: 671, y: 278 },
+        'A.-1.17': { x: 674, y: 234 },
+        'A.-1.18': { x: 626, y: 226 },
+        'A.-1.20': { x: 621, y: 298 },
+        'D.-1.52': { x: 261, y: 297 },
+        'E.-1.63': { x: 191, y: 257 },
+        'E.-1.64': { x: 143, y: 258 },
+        'E.-1.65': { x: 142, y: 312 },
+        'E.-1.66': { x: 139, y: 369 },
+        'E.-1.69': { x: 190, y: 350 },
 
         // Hauptgebäude - Erdgeschoss
-        'A.0.11': { x: 673, y: 429 },
-        'A.0.12': { x: 676, y: 379 },
-        'A.0.14': { x: 681, y: 299 },
-        'A.0.16': { x: 690, y: 174 },
-        'A.0.18': { x: 630, y: 158 },
-        'A.0.20': { x: 625, y: 244 },
-        'A.0.21': { x: 622, y: 322 },
-        'A.0.25': { x: 618, y: 393 },
-        'B.0.30': { x: 474, y: 436 },
-        'B.0.31': { x: 547, y: 434 },
-        'C.0.40': { x: 316, y: 246 },
-        'C.0.Pausenhalle': { x: 327, y: 366 },
-        'D.0.52': { x: 184, y: 240 },
-        'E.0.64': { x: 38, y: 188 },
-        'E.0.68': { x: 36, y: 366 },
-        'E.0.69': { x: 95, y: 378 },
-        'E.0.70': { x: 98, y: 304 },
-        'E.0.Flur': { x: 66, y: 258 },
-        'Pavillon': { x: 502, y: 204 },
-        'Parkplatz A': { x: 236, y: 117 },
+        'A.0.11': { x: 614, y: 451 },
+        'A.0.12': { x: 618, y: 412 },
+        'A.0.14': { x: 621, y: 346 },
+        'A.0.16': { x: 628, y: 251 },
+        'A.0.18': { x: 583, y: 238 },
+        'A.0.20': { x: 577, y: 309 },
+        'A.0.21': { x: 574, y: 368 },
+        'A.0.25': { x: 570, y: 453 },
+        'B.0.30': { x: 517, y: 457 },
+        'B.0.31': { x: 461, y: 458 },
+        'C.0.40': { x: 337, y: 310 },
+        'C.0.Pausenhalle': { x: 343, y: 398 },
+        'D.0.52': { x: 234, y: 306 },
+        'E.0.64': { x: 119, y: 264 },
+        'E.0.68': { x: 119, y: 407 },
+        'E.0.69': { x: 164, y: 410 },
+        'E.0.70': { x: 166, y: 354 },
+        'E.0.Flur': { x: 142, y: 339 },
+        'Pavillon': { x: 482, y: 276 },
+        'Parkplatz A': { x: 597, y: 155 },
 
         // Hauptgebäude - 1. Stock
-        'B.1.31': { x: 583, y: 438 },
-        'B.1.32': { x: 529, y: 442 },
-        'B.1.33': { x: 486, y: 442 },
-        'B.1.34': { x: 430, y: 443 },
-        'C.1.41': { x: 330, y: 224 },
-        'C.1.42': { x: 360, y: 309 },
-        'C.1.44': { x: 365, y: 380 },
-        'C.1.49': { x: 305, y: 455 },
-        'D.1.52': { x: 204, y: 219 },
-        'E.1.65': { x: 38, y: 156 },
-        'E.1.67': { x: 38, y: 207 },
+        'B.1.31': { x: 519, y: 422 },
+        'B.1.32': { x: 470, y: 425 },
+        'B.1.33': { x: 431, y: 426 },
+        'B.1.34': { x: 383, y: 427 },
+        'C.1.41': { x: 314, y: 241 },
+        'C.1.42': { x: 322, y: 308 },
+        'C.1.44': { x: 323, y: 373 },
+        'C.1.49': { x: 270, y: 437 },
+        'D.1.52': { x: 180, y: 228 },
+        'E.1.65': { x: 35, y: 171 },
+        'E.1.67': { x: 34, y: 217 },
         'E.1.68': { x: 38, y: 262 },
         'E.1.69': { x: 39, y: 317 },
-        'E.1.70': { x: 35, y: 378 },
-        'E.1.72': { x: 107, y: 373 },
+        'E.1.70': { x: 31, y: 367 },
+        'E.1.72': { x: 95, y: 362 },
         'E.1.73': { x: 107, y: 290 },
 
         // Hauptgebäude - 2. Stock
-        'A.2.10': { x: 727, y: 455 },
-        'A.2.16': { x: 727, y: 112 },
-        'A.2.18': { x: 712, y: 170 },
-        'A.2.20': { x: 706, y: 234 },
-        'A.2.21': { x: 700, y: 312 },
-        'A.2.25': { x: 695, y: 394 },
-        'B.2.31': { x: 489, y: 448 },
-        'B.2.32': { x: 408, y: 451 },
-        'C.2.48': { x: 314, y: 424 },
-        'E.2.60': { x: 96, y: 288 },
-        'E.2.63': { x: 95, y: 157 },
-        'E.2.64': { x: 31, y: 154 },
-        'E.2.65': { x: 31, y: 204 },
-        'E.2.66': { x: 30, y: 259 },
+        'A.2.10': { x: 653, y: 440 },
+        'A.2.16': { x: 670, y: 144 },
+        'A.2.18': { x: 656, y: 193 },
+        'A.2.20': { x: 634, y: 241 },
+        'A.2.21': { x: 646, y: 324 },
+        'A.2.25': { x: 640, y: 395 },
+        'B.2.31': { x: 439, y: 433 },
+        'B.2.32': { x: 364, y: 435 },
+        'C.2.48': { x: 279, y: 412 },
+        'E.2.60': { x: 86, y: 288 },
+        'E.2.63': { x: 86, y: 174 },
+        'E.2.64': { x: 27, y: 169 },
+        'E.2.65': { x: 27, y: 215 },
+        'E.2.66': { x: 26, y: 264 },
 
         // Werkstatt - Erdgeschoss
         'F.0.81': { x: 488, y: 305 },
@@ -205,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (floor) {
             // Neuen Overlay laden
             currentImageOverlay = L.imageOverlay(floor.svg, CONFIG.map.bounds).addTo(map);
-            map.fitBounds(CONFIG.map.bounds);
+            map.fitBounds(CONFIG.map.bounds, { animate: false });
 
             // UI aktualisieren
             updateFloorInfo(building.name, floor.name);
@@ -273,30 +260,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Format: { id: eindeutige_id, name: 'Raumname', x: x_koordinate, y: y_koordinate, info: 'Beschreibung' }
     const floorRooms = {
         1: [ // Untergeschoss
-            { id: 1, name: 'WC', x: 831, y: 185, info: 'Die sanitären Anlagen befinden sich während der Bauarbeiten außerhalb des Gebäudes im Container hinter Gebäude A' },
-            { id: 2, name: 'WC', x: 134, y: 227, info: 'WC: Damen und Herren' }
+            { id: 1, name: 'WC', x: 613, y: 399, info: 'Die sanitären Anlagen befinden sich während der Bauarbeiten außerhalb des Gebäudes im Container hinter Gebäude A' },
+            { id: 2, name: 'WC', x: 191, y: 294, info: 'WC: Damen und Herren' }
         ],
         2: [ // Erdgeschoss
-            { id: 3, name: 'Empfang', x: 323, y: 451, info: 'Eingangshalle' },
-            { id: 4, name: 'WC', x: 98, y: 255, info: 'WC: Damen und Herren' },
-            { id: 5, name: 'WC', x: 269, y: 299, info: 'WC: Damen und Herren' }
+            { id: 3, name: 'Empfang', x: 352, y: 465, info: 'Eingangshalle' },
+            { id: 4, name: 'WC', x: 166, y: 317, info: 'WC: Damen und Herren' },
+            { id: 5, name: 'WC', x: 294, y: 352, info: 'WC: Damen und Herren' }
         ],
         3: [ // 1. Stock
-            { id: 6, name: 'WC', x: 106, y: 213, info: 'WC: Damen und Herren' },
-            { id: 7, name: 'WC', x: 351, y: 426, info: 'WC: Herren' }
+            { id: 6, name: 'WC', x: 93, y: 223, info: 'WC: Damen und Herren' },
+            { id: 7, name: 'WC', x: 313, y: 413, info: 'WC: Herren' }
         ],
         4: [ // 2. Stock
-            { id: 8, name: 'WC', x: 345, y: 424, info: 'WC: Herren' }
+            { id: 8, name: 'WC', x: 308, y: 413, info: 'WC: Herren' }
         ],
         5: [ // 3. Stock
             { id: 9, name: 'Aula', x: 326, y: 331, info: 'Aula' }
         ],
         6: [ // Werkstatt Erdgeschoss
-            { id: 10, name: 'Werkstatt 1', x: 300, y: 200, info: 'Metallbearbeitung' },
-            { id: 11, name: 'Lager', x: 500, y: 350, info: 'Materialausgabe' }
+            { id: 10, name: 'WC', x: 485, y: 268, info: 'WC: Damen und Herren' },
         ],
         7: [ // Werkstatt 1. Stock
-            { id: 12, name: 'Büro Werkstatt', x: 250, y: 180, info: 'Verwaltung Werkstatt' }
+            { id: 12, name: 'WC', x: 455, y: 227, info: 'WC: Damen und Herren' }
         ]
     };
 
@@ -677,76 +663,78 @@ document.addEventListener('DOMContentLoaded', function() {
     // Einheitliche Locate-Funktion
     function locateItem(item, type, closeOverlayFn) {
         closeOverlayFn();
-        loadFloor(item.floor);
 
-        // Zoom und Hervorhebung mit Verzögerung
+        // Stockwerk wechseln wenn nötig, aber ohne Animation
+        if (currentFloor !== item.floor) {
+            loadFloor(item.floor);
+        }
+
+        // Roten pulsierenden Punkt nach kurzer Verzögerung anzeigen
         setTimeout(() => {
-            highlightAndZoomToRoom(item.room, markerColors[type]);
-        }, CONFIG.ui.menuDelay);
+            showRedPulsingPoint(item.room);
+        }, 100);
 
         document.getElementById('floor-info').textContent = `${item.name} → ${item.room}`;
         console.log(`Navigiere zu: ${item.name} in Raum ${item.room}`);
     }
 
-    // Optimierte Funktion zum Hervorheben und Zoomen zu einem Raum
-    function highlightAndZoomToRoom(roomId, color) {
+    // Funktion für rotes Pulsieren eines Punktes
+    function showRedPulsingPoint(roomId) {
         const coords = roomCoordinates[roomId];
         if (!coords) return;
 
         // Entferne vorherigen Highlight-Marker
-        clearHighlight();
+        clearRedHighlight();
 
-        // Erstelle hervorgehobenen Marker mit Touch-Optimierung
+        // Erstelle roten pulsierenden Marker
         highlightedMarker = L.circleMarker([coords.y, coords.x], {
-            radius: CONFIG.marker.highlightRadius,
-            fillColor: color,
+            radius: 15,
+            fillColor: '#ff0000',
             color: '#ffffff',
-            weight: CONFIG.marker.highlightWeight,
-            opacity: CONFIG.marker.opacity,
-            fillOpacity: CONFIG.marker.highlightFillOpacity,
-            className: 'highlighted-marker',
-            interactive: false // Verhindert Event-Konflikte
+            weight: 3,
+            opacity: 1,
+            fillOpacity: 0.8,
+            className: 'red-highlight-marker',
+            interactive: false
         }).addTo(map);
 
-        // Optimierter Zoom mit requestAnimationFrame
-        requestAnimationFrame(() => {
-            map.setView([coords.y, coords.x], 1, {
-                animate: true,
-                duration: CONFIG.ui.zoomAnimationDuration
-            });
-        });
+        // Starte Pulsier-Animation
+        startRedPulse();
 
-        // Pulsierender Effekt
-        animatePulse();
-
-        // Automatisches Entfernen des Highlights
-        setTimeout(clearHighlight, CONFIG.ui.highlightDuration);
+        // Automatisches Entfernen nach 5 Sekunden
+        setTimeout(clearRedHighlight, 5000);
     }
 
-    // Hilfsfunktionen für bessere Lesbarkeit
-    function clearHighlight() {
+    // Funktion für das rote Pulsieren
+    function startRedPulse() {
+        let pulseCount = 0;
+        const maxPulses = 10;
+
+        const pulseInterval = setInterval(() => {
+            if (highlightedMarker && pulseCount < maxPulses) {
+                const currentRadius = highlightedMarker.getRadius();
+                const newRadius = currentRadius === 15 ? 25 : 15;
+                highlightedMarker.setRadius(newRadius);
+                pulseCount++;
+            } else {
+                clearInterval(pulseInterval);
+                if (highlightedMarker) {
+                    highlightedMarker.setRadius(15);
+                }
+            }
+        }, 300);
+    }
+
+    // Funktion zum Entfernen des roten Highlights
+    function clearRedHighlight() {
         if (highlightedMarker) {
             map.removeLayer(highlightedMarker);
             highlightedMarker = null;
         }
     }
 
-    function animatePulse() {
-        let pulseCount = 0;
-        const pulseInterval = setInterval(() => {
-            if (highlightedMarker && pulseCount < CONFIG.ui.pulseCount) {
-                const currentRadius = highlightedMarker.getRadius();
-                const newRadius = currentRadius === CONFIG.marker.highlightRadius ? 20 : CONFIG.marker.highlightRadius;
-                highlightedMarker.setRadius(newRadius);
-                pulseCount++;
-            } else {
-                clearInterval(pulseInterval);
-                if (highlightedMarker) {
-                    highlightedMarker.setRadius(12);
-                }
-            }
-        }, CONFIG.ui.pulseInterval);
-    }
+
+
 
     // Mobile Menu Funktionen
     function toggleMobileMenu() {
