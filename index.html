@@ -95,6 +95,7 @@
                 </div>
             </div>
 
+            <!-- Event-Buttons auskommentiert
             <div class="mobile-action-buttons">
                 <button class="mobile-action-btn" onclick="openVocationalOverlay(); closeMobileMenu();">
                     🎓 Tag der beruflichen Bildung
@@ -103,12 +104,13 @@
                     🏢 Berufsfindungsmesse
                 </button>
             </div>
+            -->
         </div>
     </div>
 
     <div id="map"></div>
 
-    <!-- Bottom Tab Bar (Desktop only) -->
+    <!-- Bottom Tab Bar (Desktop only) - Auskommentiert
     <div class="bottom-tab-bar desktop-only">
         <button class="tab-btn" onclick="openVocationalOverlay()">
             <span class="tab-icon" style="background: #28a745;"></span>
@@ -119,6 +121,7 @@
             <span class="tab-text">Berufsfindungsmesse</span>
         </button>
     </div>
+    -->
 
     <!-- Logo -->
     <div class="logo-container">
@@ -133,7 +136,7 @@
     </div>
 
 
-    <!-- Exhibitor Overlay -->
+    <!-- Exhibitor Overlay - Auskommentiert
     <div class="overlay" id="exhibitor-overlay" onclick="closeExhibitorOverlay()">
         <div class="overlay-content" onclick="event.stopPropagation()">
             <div class="overlay-header">
@@ -145,13 +148,14 @@
                     <input type="text" id="exhibitor-search" placeholder="Aussteller suchen..." onkeyup="filterExhibitors()">
                 </div>
                 <div class="exhibitor-list" id="exhibitor-list">
-                    <!-- Wird dynamisch gefüllt -->
+                    Wird dynamisch gefüllt
                 </div>
             </div>
         </div>
     </div>
+    -->
 
-    <!-- Vocational Education Overlay -->
+    <!-- Vocational Education Overlay - Auskommentiert
     <div class="overlay" id="vocational-overlay" onclick="closeVocationalOverlay()">
         <div class="overlay-content" onclick="event.stopPropagation()">
             <div class="overlay-header">
@@ -163,11 +167,12 @@
                     <input type="text" id="vocational-search" placeholder="Bildungsangebote suchen..." onkeyup="filterVocational()">
                 </div>
                 <div class="vocational-list" id="vocational-list">
-                    <!-- Wird dynamisch gefüllt -->
+                    Wird dynamisch gefüllt
                 </div>
             </div>
         </div>
     </div>
+    -->
 
     <!-- Welcome Overlay -->
     <div class="overlay" id="welcome-overlay" onclick="closeWelcomeOverlay()">
@@ -181,8 +186,7 @@
                     <h3>📍 So funktioniert die Navigation:</h3>
                     <ul class="welcome-list">
                         <li><strong>Stockwerke wählen:</strong> Klicken Sie auf die Buttons (UG, EG, 1., 2., 3.) um zwischen den Stockwerken zu wechseln</li>
-                        <li><strong>Räume finden:</strong> Klicken Sie auf die farbigen Punkte auf der Karte für Rauminformationen</li>
-                        <li><strong>Events:</strong> Nutzen Sie die Buttons unten für spezielle Veranstaltungen</li>
+                        <li><strong>Räume finden:</strong> Klicken Sie auf die blauen Punkte auf der Karte für Rauminformationen</li>
                     </ul>
                 </div>
 
