@@ -2,24 +2,28 @@
 // Benötigt (vorher in index.html geladen):
 //   raumkoordinaten.js  -> roomCoordinates
 //   messe-aussteller.js -> exhibitors, MESSE_TITEL
+// Versionsnummer für die Stockwerkpläne: nach jedem Austausch einer SVG ändern,
+// damit Browser nicht die alten Bilder aus dem Cache anzeigen.
+const PLAN_VERSION = '2026-09-29';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Gebäude und Stockwerk-Konfiguration
     const buildings = {
         hauptgebaeude: {
             name: 'Hauptgebäude',
             floors: {
-                1: { name: 'Untergeschoss', short: 'UG', svg: '1.svg' },
-                2: { name: 'Erdgeschoss', short: 'EG', svg: '2.svg' },
-                3: { name: '1. Stock', short: '1. OG', svg: '3.svg' },
-                4: { name: '2. Stock', short: '2. OG', svg: '4.svg' },
-                5: { name: '3. Stock', short: '3. OG', svg: '5.svg' }
+                1: { name: 'Untergeschoss', short: 'UG', svg: '1.svg?v=' + PLAN_VERSION },
+                2: { name: 'Erdgeschoss', short: 'EG', svg: '2.svg?v=' + PLAN_VERSION },
+                3: { name: '1. Stock', short: '1. OG', svg: '3.svg?v=' + PLAN_VERSION },
+                4: { name: '2. Stock', short: '2. OG', svg: '4.svg?v=' + PLAN_VERSION },
+                5: { name: '3. Stock', short: '3. OG', svg: '5.svg?v=' + PLAN_VERSION }
             }
         },
         werkstatt: {
             name: 'Werkstattgebäude',
             floors: {
-                6: { name: 'Erdgeschoss', short: 'EG', svg: '6.svg' },
-                7: { name: '1. Stock', short: '1. OG', svg: '7.svg' }
+                6: { name: 'Erdgeschoss', short: 'EG', svg: '6.svg?v=' + PLAN_VERSION },
+                7: { name: '1. Stock', short: '1. OG', svg: '7.svg?v=' + PLAN_VERSION }
             }
         }
     };
