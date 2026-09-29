@@ -95,33 +95,23 @@
                 </div>
             </div>
 
-            <!-- Event-Buttons auskommentiert
             <div class="mobile-action-buttons">
-                <button class="mobile-action-btn" onclick="openVocationalOverlay(); closeMobileMenu();">
-                    🎓 Tag der beruflichen Bildung
-                </button>
                 <button class="mobile-action-btn" onclick="openExhibitorOverlay(); closeMobileMenu();">
-                    🏢 Berufsfindungsmesse
+                    🏢 Berufsfindungsmesse – Aussteller
                 </button>
             </div>
-            -->
         </div>
     </div>
 
     <div id="map"></div>
 
-    <!-- Bottom Tab Bar (Desktop only) - Auskommentiert
+    <!-- Bottom Tab Bar (Desktop only) -->
     <div class="bottom-tab-bar desktop-only">
-        <button class="tab-btn" onclick="openVocationalOverlay()">
-            <span class="tab-icon" style="background: #28a745;"></span>
-            <span class="tab-text">Tag der beruflichen Bildung</span>
-        </button>
         <button class="tab-btn" onclick="openExhibitorOverlay()">
             <span class="tab-icon" style="background: #FFA500;"></span>
-            <span class="tab-text">Berufsfindungsmesse</span>
+            <span class="tab-text">Berufsfindungsmesse – Aussteller</span>
         </button>
     </div>
-    -->
 
     <!-- Logo -->
     <div class="logo-container">
@@ -136,7 +126,7 @@
     </div>
 
 
-    <!-- Exhibitor Overlay - Auskommentiert
+    <!-- Exhibitor Overlay (Berufsfindungsmesse) -->
     <div class="overlay" id="exhibitor-overlay" onclick="closeExhibitorOverlay()">
         <div class="overlay-content" onclick="event.stopPropagation()">
             <div class="overlay-header">
@@ -145,15 +135,12 @@
             </div>
             <div class="overlay-body">
                 <div class="search-box">
-                    <input type="text" id="exhibitor-search" placeholder="Aussteller suchen..." onkeyup="filterExhibitors()">
+                    <input type="text" id="exhibitor-search" placeholder="Aussteller, Raum oder Branche suchen..." oninput="filterExhibitors()">
                 </div>
-                <div class="exhibitor-list" id="exhibitor-list">
-                    Wird dynamisch gefüllt
-                </div>
+                <div class="exhibitor-list" id="exhibitor-list"></div>
             </div>
         </div>
     </div>
-    -->
 
     <!-- Vocational Education Overlay - Auskommentiert
     <div class="overlay" id="vocational-overlay" onclick="closeVocationalOverlay()">
@@ -187,6 +174,7 @@
                     <ul class="welcome-list">
                         <li><strong>Stockwerke wählen:</strong> Klicken Sie auf die Buttons (UG, EG, 1., 2., 3.) um zwischen den Stockwerken zu wechseln</li>
                         <li><strong>Räume finden:</strong> Klicken Sie auf die blauen Punkte auf der Karte für Rauminformationen</li>
+                        <li><strong>Berufsfindungsmesse:</strong> Orange Punkte zeigen die Aussteller. Über den Button „Berufsfindungsmesse" finden Sie alle Aussteller mit Suche – „📍 Zeigen" springt direkt zum Raum</li>
                     </ul>
                 </div>
 
@@ -221,6 +209,10 @@
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
     
+    <!-- Daten -->
+    <script src="raumkoordinaten.js"></script>
+    <script src="messe-aussteller.js"></script>
+
     <!-- Custom JavaScript -->
     <script src="script.js"></script>
 </body>
